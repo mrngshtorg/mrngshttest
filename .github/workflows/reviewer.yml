@@ -25,7 +25,7 @@ jobs:
           team="all"
           teamslug="${org}/${team}"
           echo $teamslug
-          gh pr view "${pullnumber}" --json reviewRequests
+          gh pr view "${pullnumber}" --json title
           reviewreq=$(gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug')
           echo $reviewreq
           if gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then

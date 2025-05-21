@@ -14,12 +14,13 @@ jobs:
     env:
       pullnumber: ${{ github.event.pull_request.number }}
     steps:
-      run: |
-        org="mrngshtorg"
-        repo="mrngshttest"
-        team="all"
-        teamslug="${org}/${team}"
-        if gh pr view "$pullnumber" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then
-          members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -c '[.[].login | select(. != "${{ github.actor }}")]')
-          gh api -X POST "/repos/${org}/${repo}/pulls/${pullnumber}/requested_reviewers" -d '{"reviewers":${members}}'
-        fi 
+      - name: reviewers 
+        run: |
+          org="mrngshtorg"
+          repo="mrngshttest"
+          team="all"
+          teamslug="${org}/${team}"
+          if gh pr view "$pullnumber" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then
+            members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -c '[.[].login | select(. != "${{ github.actor }}")]')
+            gh api -X POST "/repos/${org}/${repo}/pulls/${pullnumber}/requested_reviewers" -d '{"reviewers":${members}}'
+          fi 

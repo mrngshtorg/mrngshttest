@@ -1,0 +1,23 @@
+name: reviwer
+on:
+  pull_request:
+    types:
+      - edited
+      - review-requested
+
+env
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  reviewer:
+    runs-on: ubuntu-latest
+    steps:
+      org="mrngshtorg"
+      repo="mrngshttest"
+      team="all"
+      teamslug="${org}/${team}"
+      pullnumber="1"
+      if gh pr view "$pullnumber" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then
+        members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -c '[.[].login | select(. != "${{ github.actor }}")]')
+        gh api -X POST "/repos/${org}/${repo}/pulls/${pullnumber}/requested_reviewers" -d '{"reviewers":${members}}'
+      fi 

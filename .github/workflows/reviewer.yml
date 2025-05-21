@@ -24,6 +24,7 @@ jobs:
           repo="mrngshttest"
           team="all"
           teamslug="${org}/${team}"
+          gh pr view "$pullnumber" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug 
           if gh pr view "$pullnumber" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then
             members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -c '[.[].login | select(. != "${{ github.actor }}")]')
             gh api -X POST "/repos/${org}/${repo}/pulls/${pullnumber}/requested_reviewers"-f reviewers[]="${members}"

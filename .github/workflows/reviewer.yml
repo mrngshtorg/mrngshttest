@@ -26,6 +26,7 @@ jobs:
           teamslug="${org}/${team}"
           echo $teamslug
           gh pr view "${pullnumber}" 
+          gh api -X GET "/orgs/$org/teams/$team/members" | jq -c '[.[].login | select(. != "${{ github.actor }}")]'
           reviewreq=$(gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug')
           echo $reviewreq
           if gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then

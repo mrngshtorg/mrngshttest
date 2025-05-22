@@ -2,34 +2,37 @@ name: reviwer
 on:
   pull_request:
     types:
+      - push
       - edited
-      - review-requested
+      - review_requested
 
-env:
-  GITHUB_TOKEN: ${{ secrets.TEAM_READ_TOKEN }}
 
 jobs:
   reviewer:
     runs-on: ubuntu-latest
     env:
       pullnumber: ${{ github.event.pull_request.number }}
+      org="mrngshtorg"
+      repo="mrngshttest"
+      team="all"
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 
 
-      - name: 
+      - name: getmembers
+        id: getmembers
+        env:
+          GITHUB_TOKEN: ${{ secrets.TEAM_READ_TOKEN }}
         run: |
-          org="mrngshtorg"
-          repo="mrngshttest"
-          team="all"
           teamslug="${org}/${team}"
-          echo $teamslug
-          gh pr view "${pullnumber}" 
-          gh api -X GET "/orgs/$org/teams/$team/members" | jq -c '[.[].login | select(. != "${{ github.actor }}")]'
-          reviewreq=$(gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug')
-          echo $reviewreq
           if gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then
             members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -c '[.[].login | select(. != "${{ github.actor }}")]')
-            gh api -X POST "/repos/${org}/${repo}/pulls/${pullnumber}/requested_reviewers"-f reviewers[]="${members}"
+            echo ::set-output name=members::$members
           fi 
+      - name: setmembers
+        if: ${{ steps.getmembers.outputs.members }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -X POST "/repos/${org}/${repo}/pulls/${pullnumber}/requested_reviewers"-f reviewers[]="${{ steps.getmembers.outputs.members }}"

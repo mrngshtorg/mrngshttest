@@ -1,12 +1,11 @@
 name: reviwer
 
 on:
-  push:
-
   pull_request:
     types:
       - edited
       - review_requested
+      - synchronized
 
 
 jobs:

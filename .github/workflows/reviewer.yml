@@ -5,8 +5,7 @@ on:
     types:
       - edited
       - review_requested
-      - synchronized
-
+      - synchronize
 
 jobs:
   reviewer:

@@ -12,7 +12,8 @@ jobs:
     env:
       pullnumber: ${{ github.event.pull_request.number }}
       team: "all"
-      GITHUB_TOKEN: ${{ secrets.TEAM_READ_TOKEN }}
+      # GITHUB_TOKEN: ${{ secrets.TEAM_READ_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:

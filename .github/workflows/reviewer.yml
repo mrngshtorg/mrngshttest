@@ -3,7 +3,7 @@ name: reviwer
 on:
   pull_request:
     types:
-      - review_requested
+      - edit
 
 jobs:
   reviewer:

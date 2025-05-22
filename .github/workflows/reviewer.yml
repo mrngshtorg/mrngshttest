@@ -23,8 +23,9 @@ jobs:
           org=${GITHUB_REPOSITORY_OWNER}
           repo=${GITHUB_REPOSITORY}
           teamslug="${org}/${team}"
-          if gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then
-            members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -rc '[.[].login | select(. != "${{ github.actor }}")] | @csv')
-            gh pr edit ${pullnumber} --add-reviewer ${members}
-          fi 
+          gh pr edit 3 --add-reviewer tomozo1989
+          # if gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then
+          #   members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -rc '[.[].login | select(. != "${{ github.actor }}")] | @csv')
+          #   gh pr edit ${pullnumber} --add-reviewer ${members}
+          # fi 
 

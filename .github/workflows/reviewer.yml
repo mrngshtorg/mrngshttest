@@ -1,0 +1,34 @@
+name: reviwer
+
+on:
+  pull_request:
+    types:
+      - edited
+      - review_requested
+      - synchronize
+
+jobs:
+  reviewer:
+    runs-on: ubuntu-latest
+    env:
+      pullnumber: ${{ github.event.pull_request.number }}
+      org: "mrngshtorg"
+      repo: "mrngshttest"
+      team: "all"
+      GITHUB_TOKEN: ${{ secrets.TEAM_READ_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+      - name: getmembers
+        id: getmembers
+        run: |
+          teamslug="${org}/${team}"
+          if gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then
+            members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -rc '[.[].login | select(. != "${{ github.actor }}")] | @csv')
+            gh pr edit ${pullnumber} --add-reviewer ${members}
+          fi 
+
+          # ${{ github.owner }}/${{ github.repository }}
+

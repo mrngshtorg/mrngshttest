@@ -32,9 +32,9 @@ jobs:
             members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -c '[.[].login | select(. != "${{ github.actor }}")]')
             echo ::set-output name=members::$members
           fi 
+
       - name: setmembers
-        if: ${{ steps.getmembers.outputs.members }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api -X POST "/repos/${org}/${repo}/pulls/${pullnumber}/requested_reviewers"-f reviewers[]='${{ steps.getmembers.outputs.members }}'
+          gh api -X POST "/repos/${org}/${repo}/pulls/${pullnumber}/requested_reviewers" -f reviewers[]='${{ steps.getmembers.outputs.members }}'

@@ -3,9 +3,7 @@ name: reviwer
 on:
   pull_request:
     types:
-      - edited
       - review_requested
-      - synchronize
 
 jobs:
   reviewer:

@@ -27,6 +27,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TEAM_READ_TOKEN }}
         run: |
+          echo ${pullnumber}
           teamslug="${org}/${team}"
           if gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then
             members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -c '[.[].login | select(. != "${{ github.actor }}")]')
@@ -37,4 +38,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo ${pullnumber}
           gh api -X POST "/repos/${org}/${repo}/pulls/${pullnumber}/requested_reviewers" -f reviewers[]='${{ steps.getmembers.outputs.members }}'

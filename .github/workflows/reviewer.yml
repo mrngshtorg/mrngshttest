@@ -15,6 +15,7 @@ jobs:
       org: "mrngshtorg"
       repo: "mrngshttest"
       team: "all"
+      GITHUB_TOKEN: ${{ secrets.TEAM_READ_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,23 +24,12 @@ jobs:
       - name: getmembers
         id: getmembers
         env:
-          GITHUB_TOKEN: ${{ secrets.TEAM_READ_TOKEN }}
         run: |
           teamslug="${org}/${team}"
           if gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then
-            members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -c '[.[].login | select(. != "${{ github.actor }}")]')
-            echo ::set-output name=members::$members
+            members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -rc '[.[].login | select(. != "${{ github.actor }}")] | @csv')
+            gh pr edit ${pullnumber} --add-reviewer ${members}
           fi 
 
           # ${{ github.owner }}/${{ github.repository }}
 
-      - name: setmembers
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"\
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/${org}/${repo}/pulls/${pullnumber}/requested_reviewers \
-            -d '{"reviewers": ${{ steps.getmembers.outputs.members }} }'

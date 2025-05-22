@@ -23,7 +23,6 @@ jobs:
 
       - name: getmembers
         id: getmembers
-        env:
         run: |
           teamslug="${org}/${team}"
           if gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then

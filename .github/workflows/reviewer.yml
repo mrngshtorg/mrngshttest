@@ -4,6 +4,7 @@ on:
   pull_request:
     types:
       - edit
+      - synchronize
 
 jobs:
   reviewer:

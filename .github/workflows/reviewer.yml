@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       pullnumber: ${{ github.event.pull_request.number }}
-      org: "mrngshtorg"
-      repo: "mrngshttest"
       team: "all"
       GITHUB_TOKEN: ${{ secrets.TEAM_READ_TOKEN }}
     steps:
@@ -22,11 +20,11 @@ jobs:
       - name: getmembers
         id: getmembers
         run: |
+          org=${GITHUB_REPOSITORY_OWNER}
+          repo=${GITHUB_REPOSITORY}
           teamslug="${org}/${team}"
           if gh pr view "${pullnumber}" --json reviewRequests | jq -r '.reviewRequests[].slug' | grep $teamslug; then
             members=$(gh api -X GET "/orgs/$org/teams/$team/members" | jq -rc '[.[].login | select(. != "${{ github.actor }}")] | @csv')
             gh pr edit ${pullnumber} --add-reviewer ${members}
           fi 
-
-          # ${{ github.owner }}/${{ github.repository }}
 

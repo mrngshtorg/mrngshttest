@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       pullnumber: ${{ github.event.pull_request.number }}
-      org="mrngshtorg"
-      repo="mrngshttest"
-      team="all"
+      org: "mrngshtorg"
+      repo: "mrngshttest"
+      team: "all"
     steps:
       - uses: actions/checkout@v4
         with:
